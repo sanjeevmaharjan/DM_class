@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AssociationRuleMining {
     public class ItemSetModel {
-        List<string> items;
+        public List<string> items;
 
         public ItemSetModel() {}
         public ItemSetModel(params string[] items) {

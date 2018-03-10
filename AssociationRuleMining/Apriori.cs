@@ -13,7 +13,7 @@ namespace AssociationRuleMining
 
         public void CountSupport()
         {
-            var lastL = qualifiedItemSet.LastOrDefault();
+            var L = qualifiedItemSet.LastOrDefault();
             try
             {
                 string line;
@@ -21,20 +21,19 @@ namespace AssociationRuleMining
                 while ((line = srFile.ReadLine()) != null)
                 {
                     var lineData = line.Split(',');
-                    if (lineData.Length != singletonItemset.Count)
+                    if (lineData.Length != L.Count)
                     {
                         break;
                     }
 
                     for (int i = 0; i < lineData.Length; i++)
                     {
-                        singletonItemset[i].AddCount(Convert.ToInt16(lineData[i]));
+                        L[i].AddCount(Convert.ToInt16(lineData[i]));
                     }
                 }
 
                 qualifiedItemSet.Add(
-                    singletonItemset
-                        .Where(x => x.count > 3)
+                    L.Where(x => x.count > 3)
                             .ToList<DatasetModel>()
                 );
             }
@@ -57,11 +56,14 @@ namespace AssociationRuleMining
                 var cprev = qualifiedItemSet.LastOrDefault()
                                         .Select(x => x.itemset)
                                         .ToList<ItemSetModel>();
-                c = (
-                    from x in cprev
-                    join y in cprev
-                    select new ItemSetModel($"{x},{y}")
-                ).ToList<ItemSetModel>();
+                var temp = cprev;
+                c = new List<ItemSetModel>();
+                for (int i = 0; i < cprev.Count; i++) {
+                    for (int j = 0; j < temp.Count; j++) {
+                        c.Add(new ItemSetModel(cprev[i].items.FirstOrDefault(), temp[j].items.FirstOrDefault()));
+                    }
+                    temp = cprev.GetRange(i+1, cprev.Count - i - 1);
+                }
             }
             else
             {
